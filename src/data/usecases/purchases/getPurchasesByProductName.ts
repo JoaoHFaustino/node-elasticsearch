@@ -5,7 +5,7 @@ import elasticsearchClient from "@/infra/elasticsearch/elasticsearchClient";
 export class GetPurchasesByProductName implements IGetPurchasesByProductNameProtocol {
     async getPurchasesByProductName(params: IGetPurchasesByProductNameProtocol.Params): Promise<IGetPurchasesByProductNameProtocol.Result> {
         try {
-            const { productName } = params;
+            const { productName, page = 1, pageSize = 10 } = params;
 
             const response = await elasticsearchClient.search({
                 index: 'purchase_history',
@@ -24,7 +24,9 @@ export class GetPurchasesByProductName implements IGetPurchasesByProductNameProt
                             }
                         }
                     }
-                }
+                },
+                from: (page - 1) * pageSize,
+                size: pageSize
             });
 
             const purchases = response.hits.hits.map((hit: any) => hit._source as Purchase);
@@ -33,8 +35,15 @@ export class GetPurchasesByProductName implements IGetPurchasesByProductNameProt
                 return null;
             }
 
+            const total = typeof response.hits.total === 'number'
+                ? response.hits.total
+                : response.hits.total?.value || 0;
+
             return {
-                purchases
+                purchases,
+                total,
+                page,
+                pageSize
             };
         } catch (error: any) {
             throw new Error(error.message || 'Error fetching purchase by produtcName from Elasticsearch');

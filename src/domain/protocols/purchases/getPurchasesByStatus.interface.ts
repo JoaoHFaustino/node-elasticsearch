@@ -7,10 +7,15 @@ export namespace IGetPurchasesByStatusProtocol {
 
 interface GetPurchasesByStatusParams {
     status: string;
+    page: number;
+    pageSize: number;
 }
 
 interface GetPurchasesByStatusResult {
     purchases: Array<Purchase>;
+    total: number;
+    page: number;
+    pageSize: number;
 }
 
 export interface IGetPurchasesByStatusProtocol {

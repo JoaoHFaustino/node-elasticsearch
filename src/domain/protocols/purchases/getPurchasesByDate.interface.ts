@@ -8,10 +8,15 @@ export namespace IGetPurchasesByDateProtocol {
 interface GetPurchasesByDateParams {
     startDate: string;
     endDate: string;
+    page: number;
+    pageSize: number;
 }
 
 interface GetPurchasesByDateResult {
     purchases: Array<Purchase>;
+    total: number;
+    page: number;
+    pageSize: number;
 }
 
 export interface IGetPurchasesByDateProtocol {

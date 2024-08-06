@@ -1,6 +1,4 @@
 export * from './addPurchaseValidation'
-export * from './getPurchaseByIdValidation'
-export * from './getPurchasesByCustomerValidation'
 export * from './getPurchasesByDateValidation'
 export * from './getPurchasesByProductNameValidation'
 export * from './getPurchasesByStatusValidation'

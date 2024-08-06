@@ -7,10 +7,15 @@ export namespace IGetPurchasesByCustomerProtocol {
 
 interface GetPurchasesByCustomerParams {
     customerId: string;
+    page: number;
+    pageSize: number;
 }
 
 interface GetPurchasesByCustomerResult {
     purchases: Array<Purchase>;
+    total: number;
+    page: number;
+    pageSize: number;
 }
 
 export interface IGetPurchasesByCustomerProtocol {

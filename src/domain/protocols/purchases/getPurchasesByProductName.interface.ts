@@ -7,10 +7,15 @@ export namespace IGetPurchasesByProductNameProtocol {
 
 interface GetPurchasesByProductNameParams {
     productName: string;
+    page: number;
+    pageSize: number;
 }
 
 interface GetPurchasesByProductNameResult {
     purchases: Array<Purchase>;
+    total: number;
+    page: number;
+    pageSize: number;
 }
 
 export interface IGetPurchasesByProductNameProtocol {

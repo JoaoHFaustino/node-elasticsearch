@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { GetPurchases, GetPurchasesById, GetPurchasesByCustomer, GetPurchasesByDate, GetPurchasesByStatus, AddPurchase } from '@/data/usecases/purchases';
 import { GetPurchasesByProductName } from '@/data/usecases/purchases/getPurchasesByProductName';
 import { Purchase } from '@/domain/models/purchases';
-import { addPurchaseSchema, getPurchaseByIdSchema, getPurchasesByCustomerSchema, getPurchasesByDateSchema, getPurchasesByProductNameSchema, getPurchasesByStatusSchema } from '@/validators/purchases';
+import { addPurchaseSchema, getPurchasesByDateSchema, getPurchasesByProductNameSchema, getPurchasesByStatusSchema } from '@/validators/purchases';
 export class PurchasesController {
     private getPurchasesUseCase: GetPurchases;
     private getPurchaseByIdUseCase: GetPurchasesById;
@@ -24,7 +24,10 @@ export class PurchasesController {
 
     async getPurchases(req: Request, res: Response): Promise<Response> {
         try {
-            const response = await this.getPurchasesUseCase.getPurchases();
+            const page = parseInt(req.query.page as string, 10) || 1;
+            const pageSize = parseInt(req.query.pageSize as string, 10) || 10;
+
+            const response = await this.getPurchasesUseCase.getPurchases({ page, pageSize });
 
             if (!response) {
                 return res.status(404).json({
@@ -43,14 +46,6 @@ export class PurchasesController {
 
     async getPurchaseById(req: Request, res: Response): Promise<Response> {
         try {
-            const { error } = getPurchaseByIdSchema.validate(req.query, { abortEarly: false });
-
-            if (error) {
-              return res.status(400).json({
-                message: 'Validation error',
-                details: error.details.map(detail => detail.message),
-              });
-            }
 
             const purchaseId = req.params.id;
             const response = await this.getPurchaseByIdUseCase.getPurchaseById({ orderId: purchaseId });
@@ -72,16 +67,11 @@ export class PurchasesController {
 
     async getPurchasesByCustomer(req: Request, res: Response): Promise<Response> {
         try {
-            const { error } = getPurchasesByCustomerSchema.validate(req.query, { abortEarly: false });
-
-            if (error) {
-              return res.status(400).json({
-                message: 'Validation error',
-                details: error.details.map(detail => detail.message),
-              });
-            }
             const customerId = req.params.customerId;
-            const response = await this.getPurchasesByCustomerUseCase.getPurchasesByCustomer({ customerId });
+            const page = parseInt(req.query.page as string, 10) || 1;
+            const pageSize = parseInt(req.query.pageSize as string, 10) || 10;
+
+            const response = await this.getPurchasesByCustomerUseCase.getPurchasesByCustomer({ customerId, page, pageSize });
 
             if (!response) {
                 return res.status(404).json({
@@ -103,19 +93,23 @@ export class PurchasesController {
             const { error } = getPurchasesByDateSchema.validate(req.query, { abortEarly: false });
 
             if (error) {
-              return res.status(400).json({
-                message: 'Validation error',
-                details: error.details.map(detail => detail.message),
-              });
+                return res.status(400).json({
+                    message: 'Validation error',
+                    details: error.details.map(detail => detail.message),
+                });
             }
 
             const { startDate, endDate } = req.query;
+            const page = parseInt(req.query.page as string, 10) || 1;
+            const pageSize = parseInt(req.query.pageSize as string, 10) || 10;
+
             if (typeof startDate !== 'string' || typeof endDate !== 'string') {
                 return res.status(400).json({
                     message: 'Invalid query parameters'
                 });
             }
-            const response = await this.getPurchasesByDateUseCase.getPurchasesByDate({ startDate, endDate });
+
+            const response = await this.getPurchasesByDateUseCase.getPurchasesByDate({ startDate, endDate, page, pageSize });
 
             if (!response) {
                 return res.status(404).json({
@@ -144,7 +138,9 @@ export class PurchasesController {
             }
             
             const status = req.params.status;
-            const response = await this.getPurchasesByStatusUseCase.getPurchasesByStatus({ status });
+            const page = parseInt(req.query.page as string, 10) || 1;
+            const pageSize = parseInt(req.query.pageSize as string, 10) || 10;
+            const response = await this.getPurchasesByStatusUseCase.getPurchasesByStatus({ status, page, pageSize });
 
             if (!response) {
                 return res.status(404).json({
@@ -173,12 +169,15 @@ export class PurchasesController {
             }
 
             const { productName } = req.query;
+            const page = parseInt(req.query.page as string, 10) || 1;
+            const pageSize = parseInt(req.query.pageSize as string, 10) || 10;
             if (typeof productName !== 'string') {
                 return res.status(400).json({
                     message: 'Invalid query parameters'
                 });
             }
-            const response = await this.getPurchasesByProductNameUseCase.getPurchasesByProductName({ productName });
+
+            const response = await this.getPurchasesByProductNameUseCase.getPurchasesByProductName({ productName, page, pageSize });
 
             if (!response) {
                 return res.status(404).json({
@@ -225,5 +224,5 @@ export class PurchasesController {
             });
         }
     }
-    
+
 }
