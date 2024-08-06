@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { GetPurchases, GetPurchasesById, GetPurchasesByCustomer, GetPurchasesByDate, GetPurchasesByStatus } from '@/data/usecases/purchases';
+import { GetPurchasesByProductName } from '@/data/usecases/purchases/getPurchasesByProductName';
 
 export class PurchasesController {
     private getPurchasesUseCase: GetPurchases;
@@ -7,6 +8,7 @@ export class PurchasesController {
     private getPurchasesByCustomerUseCase: GetPurchasesByCustomer;
     private getPurchasesByDateUseCase: GetPurchasesByDate;
     private getPurchasesByStatusUseCase: GetPurchasesByStatus;
+    private getPurchasesByProductNameUseCase: GetPurchasesByProductName
 
     constructor() {
         this.getPurchasesUseCase = new GetPurchases();
@@ -14,6 +16,7 @@ export class PurchasesController {
         this.getPurchasesByCustomerUseCase = new GetPurchasesByCustomer();
         this.getPurchasesByDateUseCase = new GetPurchasesByDate();
         this.getPurchasesByStatusUseCase = new GetPurchasesByStatus();
+        this.getPurchasesByProductNameUseCase = new GetPurchasesByProductName();
     }
 
     async getPurchases(req: Request, res: Response): Promise<Response> {
@@ -119,4 +122,30 @@ export class PurchasesController {
             });
         }
     }
+
+    async getPurchasesByProductName(req: Request, res: Response): Promise<Response> {
+        try {
+            const { productName } = req.query;
+            if (typeof productName !== 'string') {
+                return res.status(400).json({
+                    message: 'Invalid query parameters'
+                });
+            }
+            const response = await this.getPurchasesByProductNameUseCase.getPurchasesByProductName({ productName });
+
+            if (!response) {
+                return res.status(404).json({
+                    message: 'No purchases found for the given productName'
+                });
+            }
+
+            return res.status(200).json(response);
+        } catch (error: any) {
+            return res.status(500).json({
+                message: 'Internal server error',
+                error: error.message,
+            });
+        }
+    }
+    
 }
