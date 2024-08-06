@@ -1,5 +1,3 @@
-// src/domain/model/shippingAddress.ts
-
 export interface ShippingAddress {
     addressLine1: string;
     addressLine2?: string;
