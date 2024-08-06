@@ -2,7 +2,7 @@ import { Purchase } from "@/domain/models/purchases";
 
 export namespace IGetPurchasesByDateProtocol {
     export type Params = GetPurchasesByDateParams;
-    export type Result = GetPurchasesByDateResult;
+    export type Result = GetPurchasesByDateResult | null;
 }
 
 interface GetPurchasesByDateParams {

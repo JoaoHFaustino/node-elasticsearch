@@ -2,7 +2,7 @@ import { Purchase } from "@/domain/models/purchases";
 
 export namespace IGetPurchasesByCustomerProtocol {
     export type Params = GetPurchasesByCustomerParams;
-    export type Result = GetPurchasesByCustomerResult;
+    export type Result = GetPurchasesByCustomerResult | null;
 }
 
 interface GetPurchasesByCustomerParams {
