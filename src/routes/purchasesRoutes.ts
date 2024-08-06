@@ -10,5 +10,6 @@ purchaseRoutes.get('/purchases/date', (req, res) => purchasesController.getPurch
 purchaseRoutes.get('/purchases/product-name', (req, res) => purchasesController.getPurchasesByProductName(req, res));
 purchaseRoutes.get('/purchases/status/:status', (req, res) => purchasesController.getPurchasesByStatus(req, res));
 purchaseRoutes.get('/purchases/:id', (req, res) => purchasesController.getPurchaseById(req, res));
+purchaseRoutes.post('/purchases', (req, res) => purchasesController.addPurchase(req, res));
 
 export default purchaseRoutes;

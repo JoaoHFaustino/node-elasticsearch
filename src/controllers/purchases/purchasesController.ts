@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { GetPurchases, GetPurchasesById, GetPurchasesByCustomer, GetPurchasesByDate, GetPurchasesByStatus } from '@/data/usecases/purchases';
+import { GetPurchases, GetPurchasesById, GetPurchasesByCustomer, GetPurchasesByDate, GetPurchasesByStatus, AddPurchase } from '@/data/usecases/purchases';
 import { GetPurchasesByProductName } from '@/data/usecases/purchases/getPurchasesByProductName';
+import { Purchase } from '@/domain/models/purchases';
 
 export class PurchasesController {
     private getPurchasesUseCase: GetPurchases;
@@ -9,6 +10,7 @@ export class PurchasesController {
     private getPurchasesByDateUseCase: GetPurchasesByDate;
     private getPurchasesByStatusUseCase: GetPurchasesByStatus;
     private getPurchasesByProductNameUseCase: GetPurchasesByProductName
+    private addPurchaseUseCase: AddPurchase
 
     constructor() {
         this.getPurchasesUseCase = new GetPurchases();
@@ -17,6 +19,7 @@ export class PurchasesController {
         this.getPurchasesByDateUseCase = new GetPurchasesByDate();
         this.getPurchasesByStatusUseCase = new GetPurchasesByStatus();
         this.getPurchasesByProductNameUseCase = new GetPurchasesByProductName();
+        this.addPurchaseUseCase = new AddPurchase();
     }
 
     async getPurchases(req: Request, res: Response): Promise<Response> {
@@ -144,6 +147,28 @@ export class PurchasesController {
             return res.status(500).json({
                 message: 'Internal server error',
                 error: error.message,
+            });
+        }
+    }
+
+    async addPurchase(req: Request, res: Response): Promise<Response> {
+        try {
+            const purchaseData: Purchase = req.body;
+            const result = await this.addPurchaseUseCase.addPurchase({ purchase: purchaseData });
+
+            if (!result.success) {
+                return res.status(400).json({
+                    message: result.message
+                });
+            }
+
+            return res.status(201).json({
+                message: result.message
+            });
+        } catch (error: any) {
+            return res.status(500).json({
+                message: 'Failed to create purchase',
+                error: error.message
             });
         }
     }
