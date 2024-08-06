@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.14.0",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "joi": "^17.13.3"
   }
 }

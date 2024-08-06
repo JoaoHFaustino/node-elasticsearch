@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { GetPurchases, GetPurchasesById, GetPurchasesByCustomer, GetPurchasesByDate, GetPurchasesByStatus, AddPurchase } from '@/data/usecases/purchases';
 import { GetPurchasesByProductName } from '@/data/usecases/purchases/getPurchasesByProductName';
 import { Purchase } from '@/domain/models/purchases';
-
+import { addPurchaseSchema, getPurchaseByIdSchema, getPurchasesByCustomerSchema, getPurchasesByDateSchema, getPurchasesByProductNameSchema, getPurchasesByStatusSchema } from '@/validators/purchases';
 export class PurchasesController {
     private getPurchasesUseCase: GetPurchases;
     private getPurchaseByIdUseCase: GetPurchasesById;
@@ -43,6 +43,15 @@ export class PurchasesController {
 
     async getPurchaseById(req: Request, res: Response): Promise<Response> {
         try {
+            const { error } = getPurchaseByIdSchema.validate(req.query, { abortEarly: false });
+
+            if (error) {
+              return res.status(400).json({
+                message: 'Validation error',
+                details: error.details.map(detail => detail.message),
+              });
+            }
+
             const purchaseId = req.params.id;
             const response = await this.getPurchaseByIdUseCase.getPurchaseById({ orderId: purchaseId });
 
@@ -63,6 +72,14 @@ export class PurchasesController {
 
     async getPurchasesByCustomer(req: Request, res: Response): Promise<Response> {
         try {
+            const { error } = getPurchasesByCustomerSchema.validate(req.query, { abortEarly: false });
+
+            if (error) {
+              return res.status(400).json({
+                message: 'Validation error',
+                details: error.details.map(detail => detail.message),
+              });
+            }
             const customerId = req.params.customerId;
             const response = await this.getPurchasesByCustomerUseCase.getPurchasesByCustomer({ customerId });
 
@@ -83,6 +100,15 @@ export class PurchasesController {
 
     async getPurchasesByDate(req: Request, res: Response): Promise<Response> {
         try {
+            const { error } = getPurchasesByDateSchema.validate(req.query, { abortEarly: false });
+
+            if (error) {
+              return res.status(400).json({
+                message: 'Validation error',
+                details: error.details.map(detail => detail.message),
+              });
+            }
+
             const { startDate, endDate } = req.query;
             if (typeof startDate !== 'string' || typeof endDate !== 'string') {
                 return res.status(400).json({
@@ -108,6 +134,15 @@ export class PurchasesController {
 
     async getPurchasesByStatus(req: Request, res: Response): Promise<Response> {
         try {
+            const { error } = getPurchasesByStatusSchema.validate(req.query, { abortEarly: false });
+
+            if (error) {
+              return res.status(400).json({
+                message: 'Validation error',
+                details: error.details.map(detail => detail.message),
+              });
+            }
+            
             const status = req.params.status;
             const response = await this.getPurchasesByStatusUseCase.getPurchasesByStatus({ status });
 
@@ -128,6 +163,15 @@ export class PurchasesController {
 
     async getPurchasesByProductName(req: Request, res: Response): Promise<Response> {
         try {
+            const { error } = getPurchasesByProductNameSchema.validate(req.query, { abortEarly: false });
+
+            if (error) {
+              return res.status(400).json({
+                message: 'Validation error',
+                details: error.details.map(detail => detail.message),
+              });
+            }
+
             const { productName } = req.query;
             if (typeof productName !== 'string') {
                 return res.status(400).json({
@@ -153,6 +197,15 @@ export class PurchasesController {
 
     async addPurchase(req: Request, res: Response): Promise<Response> {
         try {
+            const { error } = addPurchaseSchema.validate(req.body, { abortEarly: false });
+
+            if (error) {
+              return res.status(400).json({
+                message: 'Validation error',
+                details: error.details.map(detail => detail.message),
+              });
+            }
+
             const purchaseData: Purchase = req.body;
             const result = await this.addPurchaseUseCase.addPurchase({ purchase: purchaseData });
 
