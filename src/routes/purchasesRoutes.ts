@@ -11,5 +11,6 @@ purchaseRoutes.get('/purchases/product-name', (req, res) => purchasesController.
 purchaseRoutes.get('/purchases/status/:status', (req, res) => purchasesController.getPurchasesByStatus(req, res));
 purchaseRoutes.get('/purchases/:id', (req, res) => purchasesController.getPurchaseById(req, res));
 purchaseRoutes.post('/purchases', (req, res) => purchasesController.addPurchase(req, res));
+purchaseRoutes.delete('/purchases/:orderId',(req, res) => purchasesController.deletePurchase(req, res));
 
 export default purchaseRoutes;

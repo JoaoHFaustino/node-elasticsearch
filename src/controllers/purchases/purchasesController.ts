@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { GetPurchases, GetPurchasesById, GetPurchasesByCustomer, GetPurchasesByDate, GetPurchasesByStatus, AddPurchase } from '@/data/usecases/purchases';
+import { GetPurchases, GetPurchasesById, GetPurchasesByCustomer, GetPurchasesByDate, GetPurchasesByStatus, AddPurchase, DeletePurchase } from '@/data/usecases/purchases';
 import { GetPurchasesByProductName } from '@/data/usecases/purchases/getPurchasesByProductName';
 import { Purchase } from '@/domain/models/purchases';
 import { addPurchaseSchema, getPurchasesByDateSchema, getPurchasesByProductNameSchema, getPurchasesByStatusSchema } from '@/validators/purchases';
@@ -11,6 +11,7 @@ export class PurchasesController {
     private getPurchasesByStatusUseCase: GetPurchasesByStatus;
     private getPurchasesByProductNameUseCase: GetPurchasesByProductName
     private addPurchaseUseCase: AddPurchase
+    private deletePurchaseUseCase: DeletePurchase
 
     constructor() {
         this.getPurchasesUseCase = new GetPurchases();
@@ -20,6 +21,7 @@ export class PurchasesController {
         this.getPurchasesByStatusUseCase = new GetPurchasesByStatus();
         this.getPurchasesByProductNameUseCase = new GetPurchasesByProductName();
         this.addPurchaseUseCase = new AddPurchase();
+        this.deletePurchaseUseCase = new DeletePurchase();
     }
 
     async getPurchases(req: Request, res: Response): Promise<Response> {
@@ -131,12 +133,12 @@ export class PurchasesController {
             const { error } = getPurchasesByStatusSchema.validate(req.query, { abortEarly: false });
 
             if (error) {
-              return res.status(400).json({
-                message: 'Validation error',
-                details: error.details.map(detail => detail.message),
-              });
+                return res.status(400).json({
+                    message: 'Validation error',
+                    details: error.details.map(detail => detail.message),
+                });
             }
-            
+
             const status = req.params.status;
             const page = parseInt(req.query.page as string, 10) || 1;
             const pageSize = parseInt(req.query.pageSize as string, 10) || 10;
@@ -162,10 +164,10 @@ export class PurchasesController {
             const { error } = getPurchasesByProductNameSchema.validate(req.query, { abortEarly: false });
 
             if (error) {
-              return res.status(400).json({
-                message: 'Validation error',
-                details: error.details.map(detail => detail.message),
-              });
+                return res.status(400).json({
+                    message: 'Validation error',
+                    details: error.details.map(detail => detail.message),
+                });
             }
 
             const { productName } = req.query;
@@ -199,10 +201,10 @@ export class PurchasesController {
             const { error } = addPurchaseSchema.validate(req.body, { abortEarly: false });
 
             if (error) {
-              return res.status(400).json({
-                message: 'Validation error',
-                details: error.details.map(detail => detail.message),
-              });
+                return res.status(400).json({
+                    message: 'Validation error',
+                    details: error.details.map(detail => detail.message),
+                });
             }
 
             const purchaseData: Purchase = req.body;
@@ -225,4 +227,21 @@ export class PurchasesController {
         }
     }
 
+    async deletePurchase(req: Request, res: Response): Promise<Response> {
+        try {
+            const orderId = req.params.orderId
+            const result = await this.deletePurchaseUseCase.deletePurchase({ orderId });
+            if (!result) {
+                return res.status(404).json({
+                    message: 'Purchase not found or failed to delete'
+                });
+            }
+            return res.status(204);
+        } catch (error: any) {
+            return res.status(500).json({
+                message: 'Internal server error',
+                error: error.message,
+            });
+        }
+    }
 }
